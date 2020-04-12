@@ -4,6 +4,12 @@
 $install_docker_script = <<SCRIPT
 echo "Installing dependencies ..."
 sudo apt-get update
+export LANGUAGE=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+locale-gen en_US.UTF-8
+dpkg-reconfigure locales
+
 echo Installing Docker...
 curl -sSL https://get.docker.com/ | sh
 sudo usermod -aG docker vagrant
@@ -23,6 +29,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = BOX_NAME
     config.vm.synced_folder ".", "/vagrant"
     config.vm.provision "shell",inline: $install_docker_script, privileged: true
+    config.vm.synced_folder "/var/tmp/vagrant/apt-archives/", "/var/cache/apt/archives/", create: true
+    config.vm.synced_folder "/var/tmp/vagrant/apt-lists/", "/var/lib/apt/lists", create: true
     config.vm.provider "virtualbox" do |vb|
       vb.memory = MEMORY
       vb.cpus = CPUS
