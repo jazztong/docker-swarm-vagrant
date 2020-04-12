@@ -1,5 +1,13 @@
 *log
-.vagrant/
+# Vagrant stu`````ff
+acceptance_config.yml
+boxes/*
+/.vagrant
+/website/.vagrant
+/website/build
+/vagrant-spec.config.rb
+test/vagrant-spec/.vagrant/
+ubuntu-xenial-16.04-cloudimg-console.log
 .vagrant/machines/manager01/virtualbox/action_provision
 .vagrant/machines/manager01/virtualbox/action_set_name
 .vagrant/machines/manager01/virtualbox/id
