@@ -17,13 +17,13 @@ services:
       KONG_DATABASE: postgres
       KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
       KONG_PG_HOST: db
+      KONG_PG_PASSWORD: kong
       KONG_PG_USER: ${KONG_PG_USER:-kong}
-      KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
+      # KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
     secrets:
       - kong_postgres_password
     networks:
       - kong-net
-    restart: on-failure
     deploy:
       restart_policy:
         condition: on-failure
@@ -38,12 +38,12 @@ services:
       KONG_PG_DATABASE: ${KONG_PG_DATABASE:-kong}
       KONG_PG_HOST: db
       KONG_PG_USER: ${KONG_PG_USER:-kong}
-      KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
+      KONG_PG_PASSWORD: kong
+      # KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
     secrets:
       - kong_postgres_password
     networks:
       - kong-net
-    restart: on-failure
     deploy:
       restart_policy:
         condition: on-failure
@@ -53,6 +53,8 @@ services:
     user: "${KONG_USER:-kong}"
     depends_on:
       - db
+      - kong-migrations
+      - kong-migrations-up
     environment:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ERROR_LOG: /dev/stderr
@@ -64,7 +66,8 @@ services:
       KONG_PG_USER: ${KONG_PG_USER:-kong}
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
+      KONG_PG_PASSWORD: kong
+      # KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
     secrets:
       - kong_postgres_password
     networks:
@@ -79,8 +82,11 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-    restart: on-failure
     deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
 
@@ -97,7 +103,6 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
-    restart: on-failure
     deploy:
       restart_policy:
         condition: on-failure
@@ -107,6 +112,18 @@ services:
       - kong-net
     volumes:
       - kong_data:/var/lib/postgresql/data
+
+  konga:
+    image: pantsel/konga
+    networks:
+      - kong-net
+    environment:
+      TOKEN_SECRET: km1GUr4RkcQD7DewhJPNXrCuZwcKmqjb
+      NODE_ENV: production
+    depends_on:
+      - kong
+    ports:
+      - "1337:1337"
 
 secrets:
   kong_postgres_password:
