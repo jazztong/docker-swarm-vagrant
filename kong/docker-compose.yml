@@ -2,6 +2,7 @@ version: "3.7"
 
 volumes:
   kong_data: {}
+  mongo_data: {}
 
 networks:
   kong-net:
@@ -67,6 +68,7 @@ services:
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_PG_PASSWORD: kong
+      KONG_DECLARATIVE_CONFIG: default.conf
       # KONG_PG_PASSWORD_FILE: /run/secrets/kong_postgres_password
     secrets:
       - kong_postgres_password
@@ -113,6 +115,15 @@ services:
     volumes:
       - kong_data:/var/lib/postgresql/data
 
+  mongo:
+    image: mongo
+    networks:
+      - kong-net
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
   konga:
     image: pantsel/konga
     networks:
@@ -120,8 +131,11 @@ services:
     environment:
       TOKEN_SECRET: km1GUr4RkcQD7DewhJPNXrCuZwcKmqjb
       NODE_ENV: production
+      DB_ADAPTER: mongo
+      DB_HOST: mongo
     depends_on:
       - kong
+      - db
     ports:
       - "1337:1337"
 
