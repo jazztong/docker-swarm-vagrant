@@ -28,7 +28,7 @@ sudo docker swarm join --token $(cat /vagrant/worker_token) 172.20.20.11:2377
 SCRIPT
 
 BOX_NAME = "ubuntu/xenial64"
-MEMORY = "512"
+MEMORY = "1024"
 MANAGERS = 2
 MANAGER_IP = "172.20.20.1"
 WORKERS = 2
@@ -57,6 +57,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             manager.vm.network :forwarded_port, guest: 8080, host: 8080
             manager.vm.network :forwarded_port, guest: 5000, host: 5000
             manager.vm.network :forwarded_port, guest: 9000, host: 9000
+            manager.vm.network :forwarded_port, guest: 8000, host: 8000
+            manager.vm.network :forwarded_port, guest: 1337, host: 1337
+            manager.vm.network :forwarded_port, guest: 27017, host: 27017
             manager.vm.provision "shell",inline: $manager_script, privileged: true
           else
             manager.vm.provision "shell",inline: $manager_join_script, privileged: true

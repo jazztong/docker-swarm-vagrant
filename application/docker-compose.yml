@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  webapi:
+    image: mcr.microsoft.com/dotnet/core/samples:aspnetapp
+    ports:
+      - "5000:80"
+    deploy:
+      mode: replicated
+      replicas: 2
+      placement:
+        constraints:
+          - node.platform.os == linux
+          # - node.role != manager

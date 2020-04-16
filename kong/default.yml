@@ -1,0 +1,19 @@
+_format_version: "1.1"
+
+services:
+  - name: myweb
+    url: http://webapi
+    routes:
+      - name: web-route
+        paths:
+          - /myweb
+          - /mywebv2
+          - /mywebv3
+          - /mywebv4
+          - /mywebv5
+  - name: google
+    url: https://google.com
+    routes:
+      - name: google-route
+        paths:
+          - /google
