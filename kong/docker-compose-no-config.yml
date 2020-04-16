@@ -1,9 +1,9 @@
 version: "3.7"
 
-configs:
-  kong:
-    name: kong_config_v
-    file: ./default.yml
+# configs:
+#   kong:
+#     name: kong_config_v
+#     file: ./default.yml
 
 volumes:
   kong_data: {}
@@ -13,11 +13,25 @@ networks:
     external: false
 
 services:
+  kong-config:
+    image: curlimages/curl
+    command: --location --request POST 'kong:8001/config' --form 'config=@/var/lib/kong/default.yml'
+    volumes:
+      - ./default.yml:/var/lib/kong/default.yml
+    networks:
+      - kong-net
+    deploy:
+      labels:
+        com.app.version: "v0.0.1"
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - kong-config
   kong:
     image: "${KONG_DOCKER_TAG:-kong:latest}"
-    configs:
-      - source: kong
-        target: var/lib/kong/default.yml
+    # configs:
+    #   - source: kong
+    #     target: var/lib/kong/default.yml
     user: "${KONG_USER:-kong}"
     environment:
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
@@ -27,6 +41,8 @@ services:
       KONG_ADMIN_LISTEN: "0.0.0.0:8001"
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/default.yml
+    volumes:
+      - ./default.yml:/var/lib/kong/default.yml
     networks:
       - kong-net
     ports:
