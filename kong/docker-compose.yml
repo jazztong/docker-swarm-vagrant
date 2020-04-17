@@ -2,7 +2,7 @@ version: "3.7"
 
 configs:
   kong:
-    name: kong_config_v
+    name: kong_config_v1
     file: ./default.yml
 
 volumes:

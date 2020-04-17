@@ -6,11 +6,7 @@ services:
     routes:
       - name: web-route
         paths:
-          - /myweb
-          - /mywebv2
-          - /mywebv3
-          - /mywebv4
-          - /mywebv5
+          - /
   - name: google
     url: https://google.com
     routes:
